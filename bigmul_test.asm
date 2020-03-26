@@ -28,107 +28,109 @@ LOOP:
         ld      c, condio
         call    bdos
 
-        LD    A,(XVALUE)
-        LD    B,A
-        LD    A,(YVALUE)
-        LD    C,A
+        LD      A,(XVALUE)
+        LD      B,A
+        LD      A,(YVALUE)
+        LD      C,A
         CALL    MUL8
-        LD    (EXPECT),HL
-        LD    A,(XVALUE+1)
-        LD    B,A
-        LD    A,(YVALUE+1)
-        LD    C,A
+        LD      (EXPECT),HL
+        LD      A,(XVALUE+1)
+        LD      B,A
+        LD      A,(YVALUE+1)
+        LD      C,A
         CALL    MUL8
-        LD    (EXPECT+2),HL
-        LD    A,(XVALUE)
-        LD    B,A
-        LD    A,(YVALUE+1)
-        LD    C,A
-        CALL    MUL8
-        CALL    ADDMID
-        LD    A,(XVALUE+1)
-        LD    B,A
-        LD    A,(YVALUE)
-        LD    C,A
+        LD      (EXPECT+2),HL
+        LD      A,(XVALUE)
+        LD      B,A
+        LD      A,(YVALUE+1)
+        LD      C,A
         CALL    MUL8
         CALL    ADDMID
-        LD    HL,PRODUCT
+        LD      A,(XVALUE+1)
+        LD      B,A
+        LD      A,(YVALUE)
+        LD      C,A
+        CALL    MUL8
+        CALL    ADDMID
+        LD      HL,PRODUCT
 
         EXX
-        LD    HL,XVALUE
-        LD    DE,YVALUE
-        LD    B,2
+        LD      HL,XVALUE
+        LD      DE,YVALUE
+        LD      B,2
         CALL    BIGMUL
 
         EXX
-        LD    DE,PRODUCT
-        LD    B,4
+        LD      DE,PRODUCT
+        LD      B,4
 L2:
-        DEC    HL
-        DEC    DE
-        LD    A,(DE)
-        CP    (HL)
-        JR    NZ,ERROR
+        DEC     HL
+        DEC     DE
+        LD      A,(DE)
+        CP      (HL)
+        JR      NZ,ERROR
         DJNZ    L2
 
-        LD    HL,(XVALUE)
-        INC    HL
-        LD    (XVALUE),HL
-        LD    A,L
-        OR    H
-        JR    NZ,LOOP
+        LD      HL,(XVALUE)
+        INC     HL
+        LD      (XVALUE),HL
+        LD      A,L
+        OR      H
+        JR      NZ,LOOP
 
-        LD    HL,(YVALUE)
-        INC    HL
-        LD    (YVALUE),HL
-        LD    A,L
-        OR    H
-        JR    NZ,LOOP
+        LD      HL,(YVALUE)
+        INC     HL
+        LD      (YVALUE),HL
+        LD      A,L
+        OR      H
+        JR      NZ,LOOP
 
 
-        POP    HL
+        POP     HL
 
         EXX
-        LD    DE,PRINT_OK
-        CALL  prtmesg
+        LD      DE,PRINT_OK
+        CALL    prtmesg
         RET
 
 ERROR:
-        POP    HL
-        LD    A,B
+        POP     HL
+        LD      A,B
 
         EXX
         ld      e,a
         ld      c, condio
         call    bdos
-        LD    DE,PRINT_FAIL
-        CALL  prtmesg
+        LD      DE,PRINT_FAIL
+        CALL    prtmesg
         RET
 
 ADDMID:
-        LD    A,(EXPECT+1)
-        ADD    A,L
-        LD    (EXPECT+1),A
-        LD    A,(EXPECT+2)
-        ADC    A,H
-        LD    (EXPECT+2),A
-        RET    NC
+        LD      A,(EXPECT+1)
+        ADD     A,L
+        LD      (EXPECT+1),A
+        LD      A,(EXPECT+2)
+        ADC     A,H
+        LD      (EXPECT+2),A
+        RET     NC
 
-        LD    A,(EXPECT+3)
-        INC    A
-        LD    (EXPECT+3),A
+        LD      A,(EXPECT+3)
+        INC     A
+        LD      (EXPECT+3),A
         RET
 
 ;------------------------------------------------------------------------------
 ;   Print message pointed to by (DE). It will end with a '$'.
 ;   modifies AF, DE, & HL
 
+SECTION  code_user
+
 prtmesg:
         ld      a,(de)      ; Get character from DE address
         cp      '$'
         ret     Z
         inc     de
-        push    de        ;otherwise, bump pointer and print it.
+        push    de          ;otherwise, bump pointer and print it.
         ld      e,a
         ld      c, condio
         call    bdos
@@ -140,9 +142,9 @@ prtmesg:
 SECTION  data_user
 
 PRINT_OK:
-        defm "  BIGMUL OK",lf,eos
+        defm    "  BIGMUL OK",lf,eos
 PRINT_FAIL:
-        defm " BIGMUL FAIL",lf,eos
+        defm    " BIGMUL FAIL",lf,eos
 
 ALIGN   $100
 
