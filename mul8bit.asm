@@ -3,32 +3,17 @@
 ; Out: HL product
 ; Pollutes: AF, F', BC, DE
 
-MUL8:	LD	H,MULTAB/0x100
-	LD	A,B
-	ADD	A,C
-	RRA
-	LD	L,A
-	LD	E,(HL)
-	INC	H
-	LD	D,(HL)
-	PUSH	DE
-	LD	A,B
-	SUB	A,C
-	JR	NC,NOSWAP
-	NEG
-	LD	C,B
-	AND	A
-NOSWAP:	RRA
-	LD	L,A
-	EX	AF,AF'	; SAVE CARRY
-	LD	D,(HL)
-	DEC	H
-	LD	E,(HL)
-	POP	HL
-	AND	A
-	SBC	HL,DE
-	EX	AF,AF'	; LOAD CARRY
-	RET	NC
-	LD	B,0
-	ADD	HL,BC
-	RET
+INCLUDE "config_rc2014_private.inc"
+
+SECTION code_user
+
+PUBLIC MUL8
+
+MUL8:
+        ld l,c                      ; 4
+        ld c,__IO_LUT_OPERAND_LATCH ; 7  operand latch address
+        out (c),l                   ; 12 operand X from L
+        in l,(c)                    ; 12 result Z LSB to L
+        inc c                       ; 4  result MSB address
+        in h,(c)                    ; 12 result Z MSB to H
+	    ret                         ; 10
