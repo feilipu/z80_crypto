@@ -1,3 +1,7 @@
+;------------------------------------------------------------------------------
+
+SECTION     code_user
+
 PRINT_OUT:	EQU	0x09F4
 ED_LOOP:	EQU	0x0F38
 CHAN_OPEN:	EQU	0x1601
@@ -18,8 +22,7 @@ FLAGS2:		EQU	0x5C6A
 ATTR_T:		EQU	0x5C8F
 
 	ORG	43264	; 0xA900
-	INCLUDE	"../secp256k1tab.asm"
-	INCLUDE	"tobinary.asm"
+
 	DEFS	59994 - $
 ; Floatingpoint decoding of a
 	JP	FPDEC
@@ -34,14 +37,16 @@ ATTR_T:		EQU	0x5C8F
 ; Passphrase input hidden by stars
 	JP	HIDEPW
 ; ECDSA signing of the hasher state
-SIGN:	CALL	ECDSAS
+SIGN:
+    CALL	ECDSAS
 ; EIP-2 canonization
 	LD	HL,ECDSAM + 0x1F
 	BIT	7,(HL)			; not quite perfect, but good in practice
 	JR	Z,EIP2			; already EIP-2 compliant
 	PUSH	AF			; save V
 	LD	B,0x20
-TURNS:	LD	A,(HL)
+TURNS:
+    LD	A,(HL)
 	CPL
 	LD	(HL),A
 	DEC	L
@@ -49,18 +54,21 @@ TURNS:	LD	A,(HL)
 	INC	L
 	PUSH	HL			; save ECDSAM
 	LD	B,0x20
-INCS:	INC	A
+INCS:
+    INC	A
 	LD	(HL),A
 	JR	NZ,ADDQS
 	INC	L
 	LD	A,(HL)
 	DJNZ	INCS			; increment S
-ADDQS:	POP	HL			; restore ECDSAM
+ADDQS:
+    POP	HL			; restore ECDSAM
 	CALL	MODADDQ
 	POP	HL			; restore V
 	LD	A,0x37
 	SUB	H			; flip V
-EIP2:	LD	HL,STATE0
+EIP2:
+    LD	HL,STATE0
 	SET	5,(HL)
 	LD	HL,KECCAKS + 0x61
 	LD	(HL),A
@@ -70,8 +78,10 @@ EIP2:	LD	HL,STATE0
 	CALL	MIRROR
 	LD	(KECCAKP),HL
 	JR	RETBAS
-MIRROR:	LD	B,0x20
-SIGNL1:	LD	A,(DE)
+MIRROR:
+    LD	B,0x20
+SIGNL1:
+    LD	A,(DE)
 	INC	E
 	DEC	L
 	LD	(HL),A
@@ -79,7 +89,8 @@ SIGNL1:	LD	A,(DE)
 	RET
 
 ; Public key derivation from private key in k$
-PUBKEY:	LD	HL,(CH_ADD)
+PUBKEY:
+    LD	HL,(CH_ADD)
 	PUSH	HL
 	LD	HL,VARKEY
 	LD	(CH_ADD),HL
@@ -95,7 +106,8 @@ PUBKEY:	LD	HL,(CH_ADD)
 	CP	B
 	RET	NZ
 	LD	HL,PRIVK + 0x1F
-PRIVKL:	LD	A,(DE)
+PRIVKL:
+    LD	A,(DE)
 	INC	DE
 	CALL	HEXDD
 	RET	NC
@@ -103,7 +115,8 @@ PRIVKL:	LD	A,(DE)
 	BIT	0,B
 	JR	Z,HEXB
 	DEC	HL
-HEXB:	DJNZ	PRIVKL
+HEXB:
+    DJNZ	PRIVKL
 	LD	DE,PRIVK + 0x1F
 	CALL	ECGMUL
 	LD	HL,ECB
@@ -122,13 +135,17 @@ HEXB:	DJNZ	PRIVKL
 	LD	(KECCAKP),HL
 	LD	HL,STATE0
 	SET	5,(HL)
-RETBAS:	LD      HL,0x2758
+RETBAS:
+    LD      HL,0x2758
+
 	EXX
 	LD	BC,0
 	RET
 
-HASHKC:	LD	B,0x20
-HASHKL:	LD	A,(HL)
+HASHKC:
+    LD	B,0x20
+HASHKL:
+    LD	A,(HL)
 	DEC	L
 	LD	(DE),A
 	INC	E
@@ -150,13 +167,15 @@ VAR_FETCH:
 
 ; Ethereum address checker
 ; Error codes: 0 OK, 1..40 wrong capitalization, >40 wrong format
-ETHADD:	CALL	VAR_FETCH
+ETHADD:
+    CALL	VAR_FETCH
 	JR	NZ,ETHADDE
 	DEC	B
 	LD	A,C
 	CP	0x28
 	CALL	Z,ERC55
-ETHADDE:PUSH	BC
+ETHADDE:
+    PUSH	BC
 	CALL	INIT2
 	POP	BC
 	EXX
@@ -165,16 +184,19 @@ ETHADDE:PUSH	BC
 	RET
 
 ; Passphrase input hidden by stars
-HIDEPW:	LD	HL,(CURCHL)
+HIDEPW:
+    LD	HL,(CURCHL)
 	LD	DE,OLD_OUT
 	LDI
 	LDI
 	DEC	HL
-PWHIDE:	LD	(HL),PWOUT/0x100
+PWHIDE:
+    LD	(HL),PWOUT/0x100
 	DEC	HL
 	LD	(HL),PWOUT-0x100*(PWOUT/0x100)
 	RET
-PWOUT:	OR	A
+PWOUT:
+    OR	A
 	JR	Z,PWREST
 	CP	0x0E
 	JR	Z,PWFLASH
@@ -183,17 +205,22 @@ PWOUT:	OR	A
 	BIT	7,(IY+ATTR_T-ERR_NR)
 	JR	NZ,PWBLANK
 	LD	A,"*"
-PWBLANK:SCF
-OLD_OUT:EQU	$ + 1
-PWCTRL:	CALL	PRINT_OUT
+PWBLANK:
+    SCF
+OLD_OUT:
+    EQU	$ + 1
+PWCTRL:
+    CALL	PRINT_OUT
 	RES	7,(IY+ATTR_T-ERR_NR)
 	LD	HL,(CURCHL)
 	INC	HL
 	JR	PWHIDE
-PWFLASH:CALL	PWBLANK
+PWFLASH:
+    CALL	PWBLANK
 	SET	7,(IY+ATTR_T-ERR_NR)
 	RET
-PWREST:	LD	HL,(CURCHL)
+PWREST:
+    LD	HL,(CURCHL)
 	LD	DE,(OLD_OUT)
 	LD	(HL),E
 	INC	HL
@@ -204,12 +231,14 @@ PWREST:	LD	HL,(CURCHL)
 	JP	(HL)
 
 ; Channel initialization
-INITCH:	LD	A,(ED_LOOP + 3)
+INITCH:
+    LD	A,(ED_LOOP + 3)
 	CP	0xF5		; PUSH AF?
 	JR	NZ,NOBUG	; ROM bug fixed
 	LD	A,WRKRND - INPTR
 	LD	(INPTR),A	; Workaround activated
-NOBUG:	LD	HL,(CH_TAB)
+NOBUG:
+    LD	HL,(CH_TAB)
 	LD	A,H
 	OR	L
 	RET	NZ		; Channel already open
@@ -228,11 +257,14 @@ NOBUG:	LD	HL,(CH_TAB)
 	INC	HL
 	INC	HL
 	LD	(CH_TAB),HL
-INIT2:	LD	HL,STATE0
+INIT2:
+    LD	HL,STATE0
 	RES	6,(HL)
-INIT3:	RES	5,(HL)
+INIT3:
+    RES	5,(HL)
 	JR	KECCAKI
-WRITE:	LD	HL,STATE0
+WRITE:
+    LD	HL,STATE0
 	BIT	5,(HL)
 	CALL	NZ,INIT3
 	EXX
@@ -243,22 +275,26 @@ WRITE:	LD	HL,STATE0
 	POP	BC
 	EXX
 	RET
-READ:	LD	HL,STATE0
+READ:
+    LD	HL,STATE0
 	BIT	5,(HL)
 	PUSH	HL
 	CALL	Z,KECCAK
 	POP	HL
 	SET	5,(HL)
 	BIT	3,(IY+TV_FLAG-ERR_NR)
-INPTR:	EQU	$ + 1
+INPTR:
+    EQU	$ + 1
 	JR	NZ,INPUT
 	CALL	KECCAKR
 	SCF
 	RET
-WRKRND:	LD	HL,6
+WRKRND:
+    LD	HL,6
 	ADD	HL,SP
 	LD	(HL),0x48	; Work around BEEPER bug in INPUT
-INPUT:	LD	HL,(KECCAKP)
+INPUT:
+    LD	HL,(KECCAKP)
 	LD	A,L
 	CP	KECCAKS - 0x100 * (KECCAKS / 0x100) + 0x20
 	JR	Z,INPUTE
@@ -276,48 +312,29 @@ INPUT:	LD	HL,(KECCAKP)
 	CALL	Z,KECCAKR
 	INCLUDE	"hex.asm"
 
-INPUTE:	CALL	INIT2
+INPUTE:
+    CALL	INIT2
 	RES	3,(IY+TV_FLAG-ERR_NR)	; Work around another bug in INPUT
 	LD	A,0xD
 	SCF
 	RET
 
-	INCLUDE	"../keccak.asm"
-	INCLUDE "../erc55.asm"
-	INCLUDE	"../secp256k1.asm"
-	INCLUDE "../bigmul.asm"
-	INCLUDE	"../ecdsa.asm"
-	INCLUDE "../mul8bit.asm"
-	INCLUDE "../multab.asm"
-STREAM:	DEFW	WRITE
-	DEFW	READ
-	DEFB	"H"
-STATE0:	DEFB	0
-STATE1:	DEFB	0
-STATE2:	DEFB	0
-STATE3:	DEFB	0
-	DEFW	STREAME- STREAM
-STREAME:EQU	$
-VARADD:	DEFM	"A$"
-	DEFB	0x0D
-VARKEY:	DEFM	"K$"
-	DEFB	0x0D
-	INCLUDE	"../keccaktab.asm"
-KECCAKB:EQU	IOTAT + 0x100
-KECCAKS:EQU	KECCAKB + 48
-KECCAKP:EQU	KECCAKS + 200
-MODINVU:EQU	KECCAKB + 0x100
-MODINVV:EQU	MODINVU + 0x22
-MODINVD:EQU	MODINVV + 0x22
-MODINVA:EQU	MODINVD + 0x20
-MODINVUV:EQU	MODINVA + 0x2
-ECB:	EQU	MODINVUV + 0x2
-PRIVK:	EQU	ECB + 0x40
-ECDSAZ:	EQU	PRIVK + 0x20
-ECX:	EQU	MODINVU + 0x100
-ECY:	EQU	ECX + 0x20
-ECV:	EQU	ECY + 0x20
-LAM:	EQU	ECX + 0x100
-ECW:	EQU	LAM + 0x20
-ECDSAM:	EQU	LAM
-ECDSAK:	EQU	ECDSAM + 0x100
+;------------------------------------------------------------------------------
+
+SECTION     data_user
+
+STREAM:     DEFW	WRITE
+	        DEFW	READ
+	        DEFB	'H'
+STATE0:	    DEFB	0
+STATE1:	    DEFB	0
+STATE2:	    DEFB	0
+STATE3:	    DEFB	0
+	        DEFW	STREAME - STREAM
+STREAME:
+
+VARADD:	    DEFM	"A$"
+	        DEFB	0x0D
+VARKEY:     DEFM	"K$"
+	        DEFB	0x0D
+'

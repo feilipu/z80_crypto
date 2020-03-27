@@ -1,13 +1,19 @@
-	ORG	0x8000
-	EXX
-	PUSH	HL
-	CALL	KECCAKI
-	CALL	KECCAK
-	POP	HL
-	EXX
-	RET
-	INCLUDE	"keccak.asm"
-	INCLUDE	"keccaktab.asm"
-KECCAKB:EQU	IOTAT+0x100
-KECCAKS:EQU	KECCAKB+48
-KECCAKP:EQU	KECCAKS+200
+
+SECTION     code_user
+
+EXTERN      KECCAKI
+EXTERN      KECCAK
+
+PUBLIC      _main
+
+ALIGN       $100
+
+_main:
+    EXX
+    PUSH    HL
+    CALL    KECCAKI
+    CALL    KECCAK
+    POP     HL
+    EXX
+    RET
+

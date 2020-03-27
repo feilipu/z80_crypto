@@ -1,5 +1,17 @@
-	INCLUDE	"align.asm"
-IOTAT:	DEFM	"IOTA"
+;------------------------------------------------------------------------------
+
+SECTION     data_user
+
+PUBLIC      IOTAT
+
+PUBLIC      KECCAKB
+PUBLIC      KECCAKS
+PUBLIC      KECCAKP
+
+ALIGN       $100
+
+IOTAT:
+	DEFM	"IOTA"
 	DEFB	0x80, 0x80, 0x80, 0x08
 	DEFB	0x00, 0x80, 0x00, 0x01
 	DEFB	0x80, 0x00, 0x80, 0x80
@@ -24,3 +36,61 @@ IOTAT:	DEFM	"IOTA"
 	DEFB	0x80, 0x00, 0x80, 0x8A
 	DEFB	0x00, 0x00, 0x80, 0x82
 	DEFB	0x00, 0x00, 0x00, 0x01
+
+
+ALIGN       $100
+
+KECCAKB:    DEFS    48
+KECCAKS:    DEFS    200
+KECCAKP:
+
+;------------------------------------------------------------------------------
+
+SECTION     data_user
+
+PUBLIC      MODINVU
+PUBLIC      MODINVV
+PUBLIC      MODINVD
+PUBLIC      MODINVA
+PUBLIC      MODINVUV
+
+PUBLIC      ECB
+PUBLIC      PRIVK
+PUBLIC      ECDSAZ
+
+PUBLIC      ECX
+PUBLIC      ECY
+PUBLIC      ECV
+
+PUBLIC      LAM
+PUBLIC      ECDSAM
+PUBLIC      ECW
+PUBLIC      ECDSAK
+
+ALIGN       $100
+
+MODINVU:    DEFS    0x22
+MODINVV:    DEFS    0x22
+MODINVD:    DEFS    0x20
+MODINVA:    DEFS    0x02
+MODINVUV:   DEFS    0x02
+ECB:        DEFS    0x40
+PRIVK:      DEFS    0x20
+ECDSAZ:     DEFS    0x20
+
+ALIGN       $100
+
+ECX:        DEFS    0x20
+ECY:        DEFS    0x20
+ECV:        DEFS    0x20
+
+ALIGN       $100
+
+ECDSAM:
+LAM:        DEFS    0x20
+ECW:        DEFS    0x20
+
+ALIGN       $100
+
+ECDSAK:     DEFS    0x100
+
