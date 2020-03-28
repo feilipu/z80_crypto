@@ -96,8 +96,7 @@ THETAL1:
     XOR     (IX+60)
     LD      (HL),A
     INC     L
-    DEFB    0xDD
-    INC     L    ; INC IXL
+    INC     IX          ; INC IXL
     DJNZ    THETAL1
 
     LD      D,H
@@ -159,8 +158,7 @@ THETALX:
     DJNZ    THETALX
     LD      B,8
 THETAL3:
-    DEFB    0xDD
-    DEC     L           ; DEC IXL
+    DEC     IX          ; DEC IXL
     DEC     L
     LD      E,(HL)
     LD      A,(IX-100)
@@ -198,21 +196,22 @@ RHOPI:
     EX      DE,HL
     LD      HL,RHOPIT
     LDIR                ; Stack RHOPIT
-RHOPIL:
-    EXX
-    POP     HL          ; Pi table lookup
-    LDI
-    LDI
-    LDI
-    LDI
-    LDI
-    LDI
-    LDI
-    LDI
-    EXX
-    RET                 ; Rho table lookup
 
-RHOPIR: 
+RHOPIL:                 ; Pi table lookup
+    EXX
+    POP     HL
+    LDI
+    LDI
+    LDI
+    LDI
+    LDI
+    LDI
+    LDI
+    LDI
+    EXX
+    RET
+
+RHOPIR:                 ; Rho table lookup
     DEFB    0x3E        ; LD A,x
     XOR     A
     EXX
@@ -255,8 +254,7 @@ CHIL0:
     LD      B,8
 CHIL3:
     DEC     L
-    DEFB    0xDD
-    DEC     L           ; DEC IXL
+    DEC     IX          ; DEC IXL
     LD      A,(IX - 0x20)
     CPL
     AND     (IX - 0x18)
@@ -266,8 +264,7 @@ CHIL3:
     LD      B,8
 CHIL2:
     DEC     L
-    DEFB    0xDD
-    DEC     L    ; DEC IXL
+    DEC     IX          ; DEC IXL
     LD      A,(IX + 0x08)
     CPL
     AND     (IX - 0x18)
@@ -277,8 +274,7 @@ CHIL2:
     LD      B,24
 CHIL1:
     DEC     L
-    DEFB    0xDD
-    DEC     L    ; DEC IXL
+    DEC     IX          ; DEC IXL
     LD      A,(IX + 0x08)
     CPL
     AND     (IX + 0x10)
@@ -624,7 +620,7 @@ SECTION     data_user
 RHOPIT:
     DEFW    KECCAKS + 10 * 8
     DEFW    ROTL1,RHOPIR
-    DEFW    KECCAKS + 7 * 8
+    DEFW    KECCAKS +  7 * 8
     DEFW    ROTL3,RHOPIR
     DEFW    KECCAKS + 11 * 8
     DEFW    ROTL6,RHOPIR
@@ -632,19 +628,19 @@ RHOPIT:
     DEFW    ROTL10,RHOPIR
     DEFW    KECCAKS + 18 * 8
     DEFW    ROTL15,RHOPIR
-    DEFW    KECCAKS + 3 * 8
+    DEFW    KECCAKS +  3 * 8
     DEFW    ROTL21,RHOPIR
-    DEFW    KECCAKS + 5 * 8
+    DEFW    KECCAKS +  5 * 8
     DEFW    ROTL28,RHOPIR
     DEFW    KECCAKS + 16 * 8
     DEFW    ROTL36,RHOPIR
-    DEFW    KECCAKS + 8 * 8
+    DEFW    KECCAKS +  8 * 8
     DEFW    ROTL45,RHOPIR
     DEFW    KECCAKS + 21 * 8
     DEFW    ROTL55,RHOPIR
     DEFW    KECCAKS + 24 * 8
     DEFW    ROTL2,RHOPIR
-    DEFW    KECCAKS + 4 * 8
+    DEFW    KECCAKS +  4 * 8
     DEFW    ROTL14,RHOPIR
     DEFW    KECCAKS + 15 * 8
     DEFW    ROTL27,RHOPIR
@@ -656,7 +652,7 @@ RHOPIT:
     DEFW    ROTL8,RHOPIR
     DEFW    KECCAKS + 12 * 8
     DEFW    ROTL25,RHOPIR
-    DEFW    KECCAKS + 2 * 8
+    DEFW    KECCAKS +  2 * 8
     DEFW    ROTL43,RHOPIR
     DEFW    KECCAKS + 20 * 8
     DEFW    ROTL62,RHOPIR
@@ -664,11 +660,11 @@ RHOPIT:
     DEFW    ROTL18,RHOPIR
     DEFW    KECCAKS + 22 * 8
     DEFW    ROTL39,RHOPIR
-    DEFW    KECCAKS + 9 * 8
+    DEFW    KECCAKS +  9 * 8
     DEFW    ROTL61,RHOPIR
-    DEFW    KECCAKS + 6 * 8
+    DEFW    KECCAKS +  6 * 8
     DEFW    ROTL20,RHOPIR
-    DEFW    KECCAKS + 1 * 8
+    DEFW    KECCAKS +  1 * 8
     DEFW    ROTL44,RHOPIR+1
 RHOPITE:
 
